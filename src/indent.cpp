@@ -424,6 +424,10 @@ static chunk_t *oc_msg_block_indent(chunk_t *pc, bool from_brace,
    }
    if (!tmp || (tmp->type != CT_OC_BLOCK_CARET))
    {
+      tmp = chunk_get_prev_nc(chunk_skip_to_match_rev(tmp));
+   }
+   if (!tmp || (tmp->type != CT_OC_BLOCK_CARET))
+   {
       return NULL;
    }
    if (from_caret)
