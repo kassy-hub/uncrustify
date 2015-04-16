@@ -460,6 +460,15 @@ static chunk_t *oc_msg_prev_colon(chunk_t *pc)
    return chunk_get_prev_type(pc, CT_OC_COLON, pc->level, CNAV_ALL);
 }
 
+/**
+ * We are on a '{' that has parent = OC_BLOCK_EXPR
+ * find the block pointer caret
+ */
+static chunk_t *oc_msg_prev_caret(chunk_t *pc)
+{
+    return chunk_get_prev_type(pc, CT_OC_BLOCK_CARET, pc->level, CNAV_ALL);
+}
+
 
 /**
  * Change the top-level indentation only by changing the column member in
@@ -974,8 +983,17 @@ void indent_text(void)
                      chunk_t *colon        = oc_msg_prev_colon(pc);
                      chunk_t *param_name   = chunk_get_prev(colon);
                      chunk_t *before_param = chunk_get_prev(param_name);
+                     chunk_t *caret        = oc_msg_prev_caret(pc);
+                     chunk_t *before_caret = chunk_get_prev(caret);
 
-                     if (before_param && (before_param->type == CT_NEWLINE))
+                     if (before_caret && (before_caret->type == CT_NEWLINE))
+                     {
+                        indent_from_brace   = false;
+                        indent_from_colon   = false;
+                        indent_from_caret   = true;
+                        indent_from_keyword = false;
+                     }
+                     else if (before_param && (before_param->type == CT_NEWLINE))
                      {
                         indent_from_keyword = true;
                         indent_from_colon   = false;
